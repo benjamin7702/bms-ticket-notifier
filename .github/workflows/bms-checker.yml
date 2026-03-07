@@ -1,0 +1,29 @@
+name: BMS Ticket Checker
+
+on:
+  schedule:
+    # Every 30 minutes
+    - cron: '*/30 * * * *'
+  workflow_dispatch:  # Manual trigger button
+
+jobs:
+  check-tickets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Run checker
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+        run: uv run main.py
